@@ -1,0 +1,4 @@
+tests/build/
+tests/.gradle
+run.sh
+calculate_grade.py

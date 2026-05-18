@@ -1,0 +1,57 @@
+services:
+  parabank:
+    image: parasoft/parabank
+    container_name: docker-sandbox-parabank
+    ports:
+      - "8888:8080"
+    profiles:
+      - test-local
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/parabank/index.htm"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: docker-sandbox-selenium
+    shm_size: 2gb
+    profiles:
+      - test-local
+      - test-public
+    environment:
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+      - SE_VNC_NO_PASSWORD=1
+      - SE_SCREEN_WIDTH=1800
+      - SE_SCREEN_HEIGHT=960
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    depends_on:
+      parabank:
+        condition: service_healthy
+        required: false
+
+  ubuntu:
+    build:
+      context: .
+      args:
+        uid: ${USER_ID:-1000}
+    container_name: docker-sandbox-ubuntu
+    stdin_open: true
+    tty: true
+    profiles:
+      - test-local
+      - test-public
+    volumes:
+      - ./tests:/home/selenium/tests
+    depends_on:
+      selenium:
+        condition: service_started
+      parabank:
+        condition: service_healthy
+        required: false
