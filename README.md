@@ -14,7 +14,7 @@ To configure the test runner see:
 By default the test suite will connect to `https://parabank.parasoft.com`. To run it use the command:  
 1. `docker compose --profile test-public up -d`
 2. `docker exec -it -u selenium docker-sandbox-ubuntu bash -c "cd tests && gradle clean test"`
-3. docker compose --profile test-public down -v
+3. `docker compose --profile test-public down -v`
 
 ## Local hosted service
 If the public service is down or being under high load, you can use the preconfigured localized environment.
